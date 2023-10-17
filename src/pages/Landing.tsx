@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import ScrollableContentLayout from "../layouts/ScrollableContentLayout";
+import FadeOnScrollDiv from '../components/FadeOnScrollDiv';
+import VideoAutoPlayOnFullView from '../components/VideoAutoPlayOnFullView';
 
-const AUTOPLAY_DURATION = 100;
 const Landing: React.FC = () => {
     const [autoplay, setAutoplay] = useState(true);
     const [loopCount, setLoopCount] = useState(0);  // Initialize loop count to 0
@@ -15,18 +16,16 @@ const Landing: React.FC = () => {
         }
     }
     return <ScrollableContentLayout>
-        <div className="flex flex-col items-center justify-center h-screen">
-            <h1 className="text-6xl font-bold">Wallace AI</h1>
-        </div>
-        <div className="flex flex-col items-center justify-center h-screen">
-            <video  className="w-9/10" 
-                    autoPlay={autoplay}  
-                    loop={loopCount < MAX_LOOPS - 1} // Loop video until reaching the max loops
-                    onEnded={handleVideoEnd}  // Handle the video end event
-                    muted>
+        <FadeOnScrollDiv>
+            <div className="flex flex-col items-center justify-center w-full min-h-screen">
+                <h1 className="text-6xl font-bold">Wallace AI</h1>
+            </div>
+        </FadeOnScrollDiv>
+        <div className="flex flex-col items-center justify-center">
+            <VideoAutoPlayOnFullView>
                 <source src='./delay-prediction-map.mp4' type="video/mp4" />
                 Your browser does not support the video tag.
-            </video>  
+            </VideoAutoPlayOnFullView>  
             <div className="flex">
                 {/*column for cumulative delay and delay headers*/}
                 <div className="flex flex-col justify-between items-right pl-16 w-1/5">

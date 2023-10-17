@@ -3,3 +3,18 @@
 @import 'tailwindcss/utilities';
 
 /* Global Styles Belong Here */
+.one-third-height {
+    height: 33.33%;
+}
+.two-third-height {
+    height: 66.67%;
+}
+.three-fifths-height {
+    height: 60%;
+}
+.two-fifths-height {
+    height: 40%;
+}
+.half-height {
+    height: 50%;
+}

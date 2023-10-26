@@ -23,15 +23,17 @@ const VideoAutoPlayOnHalfView: React.FC<SectionProps> = ({ children }) => {
                 // Don't autoplay on mobile, wait for user interaction
                 if(isMobile) return;
 
-                (async () => {
-                    if (entry.isIntersecting && entry.intersectionRatio >= 0.5 && videoRef.current) {
-                        if (loopCount < MAX_LOOPS) {
+                if (entry.isIntersecting && entry.intersectionRatio >= 0.5 && videoRef.current) {
+                    if (loopCount < MAX_LOOPS) {
+                        try {
                             videoRef.current.play();
+                        } catch (error) {
+                            console.error("Error playing the video:", error);
                         }
-                    } else if (videoRef.current && !videoRef.current.paused) {
-                        videoRef.current.pause();
                     }
-                })();
+                } else if (videoRef.current && !videoRef.current.paused) {
+                    videoRef.current.pause();
+                }
             },
             {
                 threshold: 0.5
@@ -68,7 +70,11 @@ const VideoAutoPlayOnHalfView: React.FC<SectionProps> = ({ children }) => {
     const handleVideoClick = () => {
         if(videoRef.current) {
             if(videoRef.current.paused) {
-                videoRef.current.play();
+                try {
+                    videoRef.current.play();
+                } catch (error) {
+                    console.error("Error playing the video on click:", error);
+                }
             } else {
                 videoRef.current.pause();
             }
@@ -80,6 +86,7 @@ const VideoAutoPlayOnHalfView: React.FC<SectionProps> = ({ children }) => {
             className="h-[95%]" 
             ref={videoRef} 
             muted 
+            playsInline
             onClick={isMobile ? handleVideoClick : undefined}
         >
             {children}

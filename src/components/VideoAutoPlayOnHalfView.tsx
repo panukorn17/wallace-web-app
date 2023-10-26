@@ -8,12 +8,22 @@ const MAX_LOOPS = 3;
 
 const VideoAutoPlayOnHalfView: React.FC<SectionProps> = ({ children }) => {
     const videoRef = useRef<HTMLVideoElement | null>(null);
-    const [loopCount, setLoopCount] = useState(0); // State to track loop count
+    const [loopCount, setLoopCount] = useState(0);
+    const [isMobile, setIsMobile] = useState(false);
+
+    // Detect if the user is on mobile
+    useEffect(() => {
+        const isMobileUserAgent = /Mobi|Android/i.test(navigator.userAgent);
+        setIsMobile(isMobileUserAgent);
+    }, []);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
             ([entry]) => {
-                (async () => { // Immediately invoked async function
+                // Don't autoplay on mobile, wait for user interaction
+                if(isMobile) return;
+
+                (async () => {
                     if (entry.isIntersecting && entry.intersectionRatio >= 0.5 && videoRef.current) {
                         if (loopCount < MAX_LOOPS) {
                             videoRef.current.play();
@@ -24,7 +34,7 @@ const VideoAutoPlayOnHalfView: React.FC<SectionProps> = ({ children }) => {
                 })();
             },
             {
-                threshold: 0.5 // Only play video when 50% of the video is visible
+                threshold: 0.5
             }
         );
 
@@ -37,25 +47,44 @@ const VideoAutoPlayOnHalfView: React.FC<SectionProps> = ({ children }) => {
                 observer.unobserve(videoRef.current);
             }
         };
-    }, [loopCount]); // Add loopCount to the dependency array
+    }, [loopCount, isMobile]);
 
     useEffect(() => {
         const handleVideoEnd = () => {
-            setLoopCount((prevCount) => prevCount + 1); // Increase loopCount by 1 when video ends
+            setLoopCount((prevCount) => prevCount + 1);
         };
 
         if (videoRef.current) {
-            videoRef.current.addEventListener('ended', handleVideoEnd); // Add event listener for video end event
+            videoRef.current.addEventListener('ended', handleVideoEnd);
         }
 
         return () => {
             if (videoRef.current) {
-                videoRef.current.removeEventListener('ended', handleVideoEnd); // Cleanup event listener
+                videoRef.current.removeEventListener('ended', handleVideoEnd);
             }
         };
-    }, []); // This effect should only run once
+    }, []);
 
-    return <video className="h-[95%]" ref={videoRef} muted>{children}</video>;
+    const handleVideoClick = () => {
+        if(videoRef.current) {
+            if(videoRef.current.paused) {
+                videoRef.current.play();
+            } else {
+                videoRef.current.pause();
+            }
+        }
+    }
+
+    return (
+        <video 
+            className="h-[95%]" 
+            ref={videoRef} 
+            muted 
+            onClick={isMobile ? handleVideoClick : undefined}
+        >
+            {children}
+        </video>
+    );
 }
 
 export default VideoAutoPlayOnHalfView;
